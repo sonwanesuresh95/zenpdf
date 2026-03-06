@@ -9,7 +9,6 @@
   </a>
 </p>
 
-> Local PDF Q&A with RAG using Ollama & LangChain
 
 A peaceful CLI tool for chatting with your documents using local AI models. All processing happens on your machine - no cloud APIs, no data leaves your device.
 
