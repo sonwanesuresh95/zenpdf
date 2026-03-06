@@ -123,26 +123,32 @@ Configuration is saved to `.zenpdf_config.json` in your working directory.
   - `nomic-embed-text` (for embeddings)
 
 ## Architecture
-
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│  Document   │────▶│   Splitter   │────▶│   ChromaDB  │
-│   Loader    │     │   (Chunks)   │     │   (Vectors) │
-└─────────────┘     └──────────────┘     └──────┬──────┘
-                                                 │
-                      ┌──────────────┐           │
-                      │   Ollama     │◀──────────┘
-                      │  (Embeddings)│
-                      └──────┬───────┘
-                             │
-                      ┌──────▼───────┐
-                      │  RAG Chain   │
-                      └──────┬───────┘
-                             │
-                      ┌──────▼───────┐
-                      │      LLM     │
-                      │   (Ollama)   │
-                      └──────────────┘
+HIGH LEVEL ARCHITECTURE
+=======================
+
+
+INDEXING PIPELINE (PDFs ➜ Vectors ➜ ChromaDB)
+
+┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
+│  PDF Files (Local)  │-->│ Doc Loader & Parser │-->│    Text Splitter    │-->│  Embedder (Ollama)  │
+└─────────────────────┘   └─────────────────────┘   └─────────────────────┘   └─────────────────────┘
+                                                                                        │
+                                                                                        ▼
+                                                                             /─────────────────────\ 
+                                                                             │                     │
+                                                                             │   ChromaDB Vector   │
+                                                                             │        Store        │
+                                                                             │                     │
+                                                                             \_____________________/
+
+
+
+QUERY PIPELINE (Question ➜ Answer)
+
+┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
+│       User CLI      │-->│  Embedder (Ollama)  │-->│      Retriever      │-->│  RAG Orchestrator   │-->│    LLM (Ollama)     │-->│       Answer        │
+└─────────────────────┘   └─────────────────────┘   └─────────────────────┘   └─────────────────────┘   └─────────────────────┘   └─────────────────────┘
 ```
 
 ## Tech Stack
